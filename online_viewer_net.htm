@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Perbandingan AQI Tajurhalang</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/lucide/dist/esm/lucide.esm.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f0f4f8;
+      margin: 0;
+      padding: 2rem;
+      color: #333;
+    }
+    h1, h2 {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .chart-container {
+      max-width: 700px;
+      margin: 0 auto 2rem;
+    }
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  max-width: 700px;
+  margin: 0 auto 2rem;
+  align-items: start; /* ensures each card starts at the top of its grid row */  /* :contentReference[oaicite:1]{index=1} */
+}
+
+.card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center; /* centers icon vertically with text */  /* :contentReference[oaicite:2]{index=2} */
+  gap: 0.5rem;
+}
+
+.card svg {
+  width: 32px !important;
+  height: 32px !important;
+  flex-shrink: 0;
+}
+
+    .card .info {
+      text-align: left;
+    }
+    .summary, .detail, .kesimpulan {
+      max-width: 700px;
+      margin: 0 auto 2rem;
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      text-align: left;
+    }
+    .summary ul {
+      margin: 0;
+      padding-left: 1rem;
+    }
+    .summary li {
+      margin-bottom: 0.5rem;
+    }
+    .detail-item {
+      margin-bottom: 1rem;
+    }
+    .detail-item strong {
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+    .kesimpulan p {
+      margin: 0;
+      line-height: 1.5;
+    }
+    .group-photo {
+      display: block;
+      margin: 0 auto;
+      max-width: 400px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Perbandingan AQI (Baseline: Tajurhalang)</h1>
+<div class="chart-container"><canvas id="aqiChart"></canvas></div>
+
+<div class="cards"></div>
+
+<h2>Ringkasan AQI</h2>
+<div class="summary">
+  <ul>
+    <li><strong>Tajurhalang (147)</strong>: Unhealthy for Sensitive Groups – rentan perlu berhati‑hati.</li>
+    <li><strong>Pantai Mutiara (188)</strong>: Unhealthy – mulai memengaruhi kesehatan umum.</li>
+    <li><strong>Kebayoran (218)</strong>: Very Unhealthy – kondisi darurat kesehatan.</li>
+    <li><strong>Pesing (348)</strong>: Hazardous – krisis kesehatan, batasi aktivitas luar.</li>
+  </ul>
+</div>
+
+<h2>Detail Polutan (Tajurhalang)</h2>
+<div class="detail">
+  <div class="detail-item">
+    <strong>PM 2.5 (58 µg/m³) – Tidak Sehat</strong>
+    <p>Partikulat halus (<2.5 μm) dapat masuk ke paru & aliran darah, menyebabkan batuk, asma berat, dan penyakit kronis.</p>
+  </div>
+  <div class="detail-item">
+    <strong>PM 10 (117 µg/m³) – Tidak Sehat</strong>
+    <p>Partikulat (<10 μm) menyebabkan iritasi mata/tenggorokan, batuk, dan asma; paparan jangka panjang lebih serius.</p>
+  </div>
+  <div class="detail-item">
+    <strong>NO₂ (32 µg/m³) – Buruk</strong>
+    <p>Nitrogen dioksida tinggi meningkatkan risiko infeksi pernapasan, batuk, dan kesulitan bernapas.</p>
+  </div>
+  <div class="detail-item">
+    <strong>SO₂ (–– µg/m³) – Lumayan</strong>
+    <p>Gas ini mengiritasi tenggorokan dan mata, serta memperburuk asma dan bronkitis kronis.</p>
+  </div>
+</div>
+
+<h2>Kesimpulan</h2>
+<div class="kesimpulan">
+  <p>📊 Tajurhalang (AQI 147) adalah baseline. Pesing berada di level Hazardous (348), menunjukkan krisis kesehatan. Masker N95/FFP2 sangat disarankan ketika berada luar ruangan, terutama bagi kelompok rentan. Perlu kontrol polusi lebih ketat.</p>
+</div>
+
+
+<h2>Foto Kelompok</h2>
+<img src="foto-kelompok.jpg" alt="Foto kelompok tugas" class="group-photo"/>
+
+</a>
+
+
+<script>
+  const data = [
+    { loc:"Tajurhalang", aqi:147, color:"#1d4ed8", icon:"cloud" },
+    { loc:"Pantai Mutiara", aqi:188, color:"#ff0000", icon:"cloud-rain" },
+    { loc:"Kebayoran", aqi:218, color:"#8f3f97", icon:"cloud-off" },
+    { loc:"Pesing", aqi:348, color:"#7e0023", icon:"cloud-lightning" },
+  ];
+
+  window.addEventListener('DOMContentLoaded', () => {
+    // Render Chart
+    const ctx = document.getElementById('aqiChart').getContext('2d');
+    const base = data[0].aqi;
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: data.map(d => d.loc),
+        datasets: [{
+          data: data.map(d => (d.aqi / base).toFixed(2)),
+          backgroundColor: data.map(d => d.color)
+        }]
+      },
+      options: {
+        plugins: {
+          legend: { display: false },
+          title: { display: true, text: 'Rasio AQI vs Tajurhalang' }
+        },
+        scales: {
+          y: { beginAtZero: true, title: { display: true, text: 'Rasio AQI' } }
+        }
+      }
+    });
+
+    // Render Cards
+    const container = document.querySelector('.cards');
+    data.forEach(d => {
+      const level = d.aqi > 300 ? 'Hazardous' :
+                    d.aqi > 200 ? 'Very Unhealthy' :
+                    d.aqi > 150 ? 'Unhealthy' :
+                    d.aqi > 100 ? 'Unhealthy SG' : 'Moderate';
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <svg data-lucide="${d.icon}" style="color:${d.color}"></svg>
+        <div class="info">
+          <strong>${d.loc}</strong><br>
+          AQI: <strong>${d.aqi}</strong> – <span style="color:${d.color}">${level}</span>
+        </div>`;
+      container.appendChild(card);
+    });
+
+    lucide.createIcons();
+  });
+</script>
+
+</body>
+</html>
